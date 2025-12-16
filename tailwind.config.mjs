@@ -13,7 +13,18 @@ export default {
 					muted: '#A476CD',      // Violeta desaturado (bordes o textos secundarios) [cite: 5]
 					text: '#363636',       // Gris oscuro (para textos principales) [cite: 6]
 					gray: '#A4A4A4',       // Gris medio (para placeholders o bordes) [cite: 7]
-					white: '#FFFFFF',      // Blanco puro
+					white: '#FFFFFF',  
+					// --- AGREGADOS FUNCIONALES (Semánticos) ---
+					// Un verde menta vibrante que contrasta genial con el violeta
+					success: '#10B981', 
+					// Un verde más oscuro para el hover del botón de compra
+					successHover: '#059669', 
+					
+					// Un rojo suave, no agresivo, para errores
+					error: '#EF4444', 
+					
+					// Un naranja cálido para advertencias (Poco stock)
+					warning: '#F59E0B',    // Blanco puro
 				},
 			},
 		},

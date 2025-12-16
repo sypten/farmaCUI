@@ -50,7 +50,7 @@ export default function UserProfile() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-gray-500">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-900 mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-farma-primary mb-4"></div>
         <p>Cargando tu perfil...</p>
       </div>
     );
@@ -67,7 +67,7 @@ export default function UserProfile() {
       {/* BARRA LATERAL (Datos Usuario) */}
       <div className="md:col-span-1">
         <div className="bg-white rounded-lg shadow p-6 text-center">
-          <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+          <div className="w-20 h-20 bg-farma-accent bg-opacity-30 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
             👤
           </div>
           <h2 className="text-xl font-bold text-gray-800 break-words">{nombreUsuario}</h2>
@@ -81,7 +81,7 @@ export default function UserProfile() {
           
           <button 
             onClick={async () => { await supabase.auth.signOut(); window.location.href='/'; }}
-            className="mt-6 w-full border border-red-500 text-red-500 py-2 rounded hover:bg-red-50 text-sm font-bold"
+            className="mt-6 w-full border border-farma-error text-farma-error py-2 rounded hover:bg-farma-error hover:bg-opacity-5 text-sm font-bold"
           >
             Cerrar Sesión
           </button>
@@ -98,7 +98,7 @@ export default function UserProfile() {
               <div key={orden.id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
                 
                 {/* Cabecera del Pedido */}
-                <div className="bg-gray-50 p-4 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4">
+                <div className="bg-white p-4 border-b border-farma-muted flex flex-wrap justify-between items-center gap-4">
                   <div>
                     <span className="text-xs font-bold text-gray-500 uppercase tracking-wide block">Orden</span>
                     <p className="font-mono text-gray-800 font-bold">#{orden.numero_orden}</p>
@@ -109,12 +109,12 @@ export default function UserProfile() {
                   </div>
                   <div>
                     <span className="text-xs font-bold text-gray-500 uppercase tracking-wide block">Total</span>
-                    <p className="text-green-600 font-bold">$ {orden.total_final?.toLocaleString('es-AR')}</p>
+                    <p className="text-farma-success font-bold">$ {orden.total_final?.toLocaleString('es-AR')}</p>
                   </div>
                   <div>
                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase inline-block
                       ${orden.estado === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : 
-                        orden.estado === 'completado' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                        orden.estado === 'completado' ? 'bg-farma-success bg-opacity-20 text-farma-success' : 'bg-farma-muted bg-opacity-20 text-farma-text'}`}>
                       {orden.estado}
                     </span>
                   </div>
@@ -144,7 +144,7 @@ export default function UserProfile() {
             <div className="text-4xl mb-4">🛒</div>
             <h3 className="text-lg font-medium text-gray-900">Aún no tienes pedidos</h3>
             <p className="text-gray-500 mb-6">¿Qué esperas para estrenar tu carrito?</p>
-            <a href="/" className="text-blue-600 hover:underline font-bold">Ir a la tienda</a>
+            <a href="/" className="text-farma-primary hover:underline font-bold">Ir a la tienda</a>
           </div>
         )}
       </div>

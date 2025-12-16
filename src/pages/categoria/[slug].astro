@@ -26,6 +26,7 @@ const { data: products, error: prodError } = await supabase
     *,
     imagenes:imagenes_producto(url)
   `)
+  .gt('stock', 0)
   .eq('categoria_id', categoria.id)
   .order('creado_en', { ascending: false });
 
@@ -34,15 +35,15 @@ const { data: products, error: prodError } = await supabase
 <Layout title={`${categoria.nombre} - FarmaCUI`}>
   <Header />
 
-  <div class="bg-gray-50 min-h-screen py-8">
+  <div class="bg-white min-h-screen py-8">
     <main class="container mx-auto px-4">
       
-      <div class="mb-8 flex items-end gap-4 border-b pb-4 border-gray-200">
+      <div class="mb-8 flex items-end gap-4 border-b pb-4 border-farma-muted">
         <div>
-          <p class="text-sm text-gray-500 font-bold uppercase tracking-wider mb-1">Categoría</p>
-          <h1 class="text-4xl font-extrabold text-blue-900">{categoria.nombre}</h1>
+          <p class="text-sm text-farma-gray font-bold uppercase tracking-wider mb-1">Categoría</p>
+          <h1 class="text-4xl font-extrabold text-farma-primary">{categoria.nombre}</h1>
         </div>
-        <span class="text-gray-500 pb-2">
+        <span class="text-farma-gray pb-2">
           ({products ? products.length : 0} productos)
         </span>
       </div>
@@ -68,7 +69,7 @@ const { data: products, error: prodError } = await supabase
           <div class="text-6xl mb-4">📦</div>
           <h3 class="text-xl font-bold text-gray-700">Esta categoría está vacía</h3>
           <p class="text-gray-500 mt-2">Pronto agregaremos productos aquí.</p>
-          <a href="/" class="inline-block mt-6 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+          <a href="/" class="inline-block mt-6 px-6 py-2 bg-farma-primary text-white rounded hover:bg-farma-secondary transition">
             Volver al inicio
           </a>
         </div>

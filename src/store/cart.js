@@ -45,3 +45,22 @@ export function removeCartItem(id) {
 export function clearCart() {
   cart.set({});
 }
+
+// src/store/cart.js
+
+// ... (tus otras funciones addCartItem, removeCartItem, etc.)
+
+export function decreaseCartItem(id) {
+  const existing = cart.get()[id];
+  if (existing) {
+    const item = JSON.parse(existing);
+    if (item.quantity > 1) {
+      // Si hay más de 1, restamos
+      item.quantity -= 1;
+      cart.setKey(id, JSON.stringify(item));
+    } else {
+      // Opcional: Si llega a 1 y restan, ¿lo borramos o no hacemos nada?
+      // Por seguridad UX, mejor dejarlo en 1 y que usen el botón de basura para borrar.
+    }
+  }
+}

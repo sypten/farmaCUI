@@ -1,5 +1,5 @@
 import { useStore } from '@nanostores/react';
-import { cart, removeCartItem, addCartItem, clearCart } from '../store/cart';
+import { cart, removeCartItem, decreaseCartItem, addCartItem, clearCart } from '../store/cart';
 import { createOrder } from '../lib/orders';
 import { supabase } from '../lib/supabase';
 import { useEffect, useState } from 'react';
@@ -86,13 +86,14 @@ export default function CartList() {
   }
 
   const increase = (item) => addCartItem(item);
+  const decrease = (id) => decreaseCartItem(id);
   const remove = (id) => { if(confirm('¿Quitar?')) removeCartItem(id); };
 
   if (items.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 text-xl mb-4">Tu carrito está vacío 😢</p>
-        <a href="/" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">Ir a comprar</a>
+        <p className="text-farma-gray text-xl mb-4">Tu carrito está vacío 😢</p>
+        <a href="/" className="bg-farma-primary text-white px-6 py-2 rounded hover:bg-farma-secondary transition">Ir a comprar</a>
       </div>
     );
   }
@@ -104,16 +105,24 @@ export default function CartList() {
         <div className="bg-white rounded-lg shadow overflow-hidden">
           {items.map((item) => (
             <div key={item.id} className="flex items-center p-4 border-b last:border-b-0 gap-4">
-              <img src={item.image || 'https://placehold.co/100'} alt={item.name} className="w-20 h-20 object-contain bg-gray-50 rounded"/>
+              <img src={item.image || 'https://placehold.co/100'} alt={item.name} className="w-20 h-20 object-contain bg-white border border-farma-muted rounded"/>
               <div className="flex-1">
-                <h3 className="font-bold text-gray-800">{item.name}</h3>
-                <div className="text-orange-500 font-bold mt-1">$ {item.price?.toLocaleString('es-AR')}</div>
+                <h3 className="font-bold text-farma-text">{item.name}</h3>
+                <div className="text-farma-primary font-bold mt-1">$ {item.price?.toLocaleString('es-AR')}</div>
               </div>
+              
+              
               <div className="flex items-center gap-3">
-                <span className="font-bold text-gray-700">x{item.quantity}</span>
-                <button onClick={() => increase(item)} className="w-8 h-8 bg-gray-100 rounded-full text-blue-600 font-bold">+</button>
+                {/* BOTÓN RESTAR (NUEVO) */}
+                <button 
+                  onClick={() => decrease(item.id)}
+                  className="w-8 h-8 bg-gray-100 rounded-full text-blue-600 font-bold hover:bg-blue-200 flex items-center justify-center disabled:opacity-50"
+                  disabled={item.quantity <= 1}>-</button>
+                <span className="font-bold text-farma-text">x{item.quantity}</span>
+                {/* BOTÓN SUMAR */}
+                <button onClick={() => increase(item)} className="w-8 h-8 bg-farma-accent rounded-full text-farma-primary font-bold">+</button>
               </div>
-              <button onClick={() => remove(item.id)} className="text-red-500 hover:text-red-700 p-2">🗑️</button>
+              <button onClick={() => remove(item.id)} className="text-farma-error hover:text-farma-error p-2">🗑️</button>
             </div>
           ))}
         </div>
@@ -122,9 +131,9 @@ export default function CartList() {
       {/* RESUMEN Y FORMULARIO (Derecha) */}
       <div className="lg:w-1/3">
         <div className="bg-white p-6 rounded-lg shadow sticky top-24">
-          <h2 className="text-xl font-bold mb-4 border-b pb-2">Resumen</h2>
-          <div className="flex justify-between mb-2 text-gray-600"><span>Subtotal</span><span>$ {total.toLocaleString('es-AR')}</span></div>
-          <div className="flex justify-between text-2xl font-bold text-gray-900 mb-6"><span>Total</span><span>$ {total.toLocaleString('es-AR')}</span></div>
+          <h2 className="text-xl font-bold mb-4 border-b pb-2 text-farma-text">Resumen</h2>
+          <div className="flex justify-between mb-2 text-farma-gray"><span>Subtotal</span><span>$ {total.toLocaleString('es-AR')}</span></div>
+          <div className="flex justify-between text-2xl font-bold text-farma-text mb-6"><span>Total</span><span>$ {total.toLocaleString('es-AR')}</span></div>
 
           {/* LÓGICA DE VISUALIZACIÓN */}
           {!showGuestForm ? (
@@ -133,33 +142,33 @@ export default function CartList() {
                 <button 
                     onClick={initCheckout}
                     disabled={processing}
-                    className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition shadow-lg text-lg"
+                    className="w-full py-3 bg-farma-success hover:bg-farma-successHover text-white rounded-lg font-bold transition shadow-lg text-lg"
                 >
                     Continuar Compra
                 </button>
-                <p className="text-center text-sm text-gray-500">
+                <p className="text-center text-sm text-farma-gray">
                     Se te pedirá iniciar sesión o continuar como invitado.
                 </p>
             </div>
           ) : (
             // VISTA 2: Formulario Invitado
-            <form onSubmit={handleCheckout} className="animate-fade-in space-y-4 bg-gray-50 p-4 rounded border border-blue-100">
-                <div className="text-sm text-blue-800 font-semibold mb-2">Comprando como Invitado</div>
+            <form onSubmit={handleCheckout} className="animate-fade-in space-y-4 bg-white p-4 rounded border border-farma-primary">
+                <div className="text-sm text-farma-primary font-semibold mb-2">Comprando como Invitado</div>
                 
                 <div>
-                    <label className="block text-sm text-gray-700 mb-1">Nombre Completo</label>
+                    <label className="block text-sm text-farma-text mb-1">Nombre Completo</label>
                     <input 
                         type="text" name="name" required 
-                        className="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full border rounded p-2 focus:ring-2 focus:ring-farma-primary outline-none"
                         placeholder="Juan Pérez"
                         onChange={handleGuestChange}
                     />
                 </div>
                 <div>
-                    <label className="block text-sm text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm text-farma-text mb-1">Email</label>
                     <input 
                         type="email" name="email" required 
-                        className="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full border rounded p-2 focus:ring-2 focus:ring-farma-primary outline-none"
                         placeholder="juan@email.com"
                         onChange={handleGuestChange}
                     />
@@ -168,13 +177,13 @@ export default function CartList() {
                 <button 
                     type="submit"
                     disabled={processing}
-                    className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition shadow-lg text-lg mt-2"
+                    className="w-full py-3 bg-farma-success hover:bg-farma-successHover text-white rounded-lg font-bold transition shadow-lg text-lg mt-2"
                 >
                     {processing ? 'Procesando...' : 'Pagar Ahora'}
                 </button>
                 
                 <div className="text-center mt-2">
-                    <a href="/login" className="text-sm text-blue-600 hover:underline">¿Ya tienes cuenta? Inicia sesión</a>
+                    <a href="/login" className="text-sm text-farma-primary hover:underline">¿Ya tienes cuenta? Inicia sesión</a>
                 </div>
             </form>
           )}

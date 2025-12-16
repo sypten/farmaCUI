@@ -54,7 +54,7 @@ export default function SearchWidget() {
     const regex = new RegExp(`(${highlight})`, 'gi');
     const parts = text.split(regex);
     return parts.map((part, index) => 
-      regex.test(part) ? <strong key={index} className="text-blue-700 font-extrabold">{part}</strong> : part
+      regex.test(part) ? <strong key={index} className="text-farma-primary font-extrabold">{part}</strong> : part
     );
   };
 
@@ -76,11 +76,11 @@ export default function SearchWidget() {
           }}
           onFocus={() => query.length >= 2 && setShowDropdown(true)}
           placeholder="Buscar medicamentos, marcas..." 
-          className="w-full border border-gray-300 rounded-full py-2 px-4 pl-10 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-gray-50 text-gray-800"
+          className="w-full border border-farma-muted rounded-full py-2 px-4 pl-10 focus:outline-none focus:border-farma-primary focus:ring-1 focus:ring-farma-primary bg-white text-farma-text"
         />
         <span className="absolute left-3 top-2.5 text-gray-400">
             {loading ? (
-                <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                <div className="animate-spin h-5 w-5 border-2 border-farma-primary border-t-transparent rounded-full"></div>
             ) : '🔍'}
         </span>
       </form>
@@ -100,9 +100,9 @@ export default function SearchWidget() {
                     <li key={prod.id}>
                         <a 
                         href={`/producto/${prod.slug}`} 
-                        className="flex items-center gap-4 p-3 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0"
+                        className="flex items-center gap-4 p-3 hover:bg-farma-accent hover:bg-opacity-20 transition-colors border-b border-farma-muted last:border-0"
                         >
-                        <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded overflow-hidden">
+                        <div className="flex-shrink-0 w-12 h-12 bg-white border border-farma-muted rounded overflow-hidden">
                             <img 
                             src={prod.imagenes?.[0]?.url || 'https://placehold.co/50'} 
                             alt={prod.nombre} 
@@ -113,7 +113,7 @@ export default function SearchWidget() {
                             <p className="text-sm text-gray-800 truncate">
                             {highlightMatch(prod.nombre, query)}
                             </p>
-                            <p className="text-xs text-orange-500 font-bold">
+                            <p className="text-xs text-farma-primary font-bold">
                             $ {prod.precio.toLocaleString('es-AR')}
                             </p>
                         </div>
@@ -123,7 +123,7 @@ export default function SearchWidget() {
                 </ul>
                 <a 
                     href={`/buscar?q=${query}`}
-                    className="block text-center text-xs text-blue-600 font-bold bg-gray-50 p-2 hover:underline"
+                    className="block text-center text-xs text-farma-primary font-bold bg-white border-t border-farma-muted p-2 hover:underline"
                 >
                     Ver todos los resultados para "{query}"
                 </a>

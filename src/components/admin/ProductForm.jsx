@@ -89,32 +89,32 @@ export default function ProductForm() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-      <h2 className="text-xl font-bold mb-6 text-gray-800 border-b pb-2">Nuevo Producto</h2>
+    <div className="bg-white p-6 rounded-lg shadow-md border border-farma-muted">
+      <h2 className="text-xl font-bold mb-6 text-farma-text border-b pb-2">Nuevo Producto</h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         
         {/* Nombre y Slug */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Nombre</label>
+            <label className="block text-sm font-medium text-farma-text">Nombre</label>
             <input 
               name="nombre" 
               type="text" 
               required
-              className="mt-1 block w-full rounded border-gray-300 shadow-sm p-2 border"
+              className="mt-1 block w-full rounded border-farma-muted shadow-sm p-2 border"
               onChange={handleChange}
               value={formData.nombre}
               placeholder="Ej: Ibuprofeno 600mg"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Slug (URL automática)</label>
+            <label className="block text-sm font-medium text-farma-text">Slug (URL automática)</label>
             <input 
               name="slug" 
               type="text" 
               required
-              className="mt-1 block w-full rounded border-gray-300 bg-gray-50 shadow-sm p-2 border text-gray-500"
+              className="mt-1 block w-full rounded border-farma-muted bg-white shadow-sm p-2 border text-farma-text"
               onChange={handleChange}
               value={formData.slug}
               readOnly
@@ -125,32 +125,32 @@ export default function ProductForm() {
         {/* Precios y Stock */}
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Precio ($)</label>
+            <label className="block text-sm font-medium text-farma-text">Precio ($)</label>
             <input name="precio" type="number" required className="mt-1 block w-full rounded border p-2" onChange={handleChange} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Stock</label>
+            <label className="block text-sm font-medium text-farma-text">Stock</label>
             <input name="stock" type="number" required className="mt-1 block w-full rounded border p-2" onChange={handleChange} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Categoría ID</label>
+            <label className="block text-sm font-medium text-farma-text">Categoría ID</label>
             <input name="categoria_id" type="number" defaultValue={1} className="mt-1 block w-full rounded border p-2" onChange={handleChange} />
           </div>
         </div>
 
         {/* Descripción */}
         <div>
-           <label className="block text-sm font-medium text-gray-700">Descripción</label>
+           <label className="block text-sm font-medium text-farma-text">Descripción</label>
            <textarea name="descripcion" rows="3" className="mt-1 block w-full rounded border p-2" onChange={handleChange}></textarea>
         </div>
 
         {/* Subida de Imagen */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Imagen Principal</label>
+          <label className="block text-sm font-medium text-farma-text">Imagen Principal</label>
           <input 
             type="file" 
             accept="image/*"
-            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            className="mt-1 block w-full text-sm text-farma-gray file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-farma-accent file:text-farma-primary hover:file:bg-farma-accent hover:file:bg-opacity-50"
             onChange={(e) => setImageFile(e.target.files[0])}
           />
         </div>
@@ -158,7 +158,7 @@ export default function ProductForm() {
         <button 
           type="submit" 
           disabled={loading}
-          className={`w-full py-3 px-4 rounded text-white font-bold transition-colors ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+          className={`w-full py-3 px-4 rounded text-white font-bold transition-colors ${loading ? 'bg-farma-gray cursor-not-allowed' : 'bg-farma-primary hover:bg-farma-secondary'}`}
         >
           {loading ? 'Guardando...' : 'Crear Producto'}
         </button>

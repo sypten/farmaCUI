@@ -14,6 +14,7 @@ const { data: products, error } = await supabase
     categoria:categorias(nombre, slug),
     imagenes:imagenes_producto(url)
   `)
+  .gt('stock', 0)
   .order('creado_en', { ascending: false }); // Los más nuevos primero
 
 if (error) {
@@ -26,16 +27,16 @@ if (error) {
   
   <main class="container mx-auto px-4 py-8">
     
-    <div class="mb-10 text-center bg-blue-50 rounded-xl p-8 shadow-sm">
-      <h1 class="text-4xl font-extrabold text-blue-900 mb-2">Bienvenido a FarmaCUI</h1>
-      <p class="text-gray-600 text-lg">Cuidamos de ti y de tu familia con los mejores precios.</p>
+    <div class="mb-10 text-center bg-farma-accent bg-opacity-10 rounded-xl p-8 shadow-sm">
+      <h1 class="text-4xl font-extrabold text-farma-primary mb-2">Bienvenido a FarmaCUI</h1>
+      <p class="text-farma-gray text-lg">Cuidamos de ti y de tu familia con los mejores precios.</p>
     </div>
     
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-bold text-gray-800 border-l-4 border-blue-600 pl-3">
+      <h2 class="text-2xl font-bold text-farma-text border-l-4 border-farma-primary pl-3">
         Productos Destacados
       </h2>
-      <a href="/categoria/farmacia" class="text-blue-600 hover:underline text-sm font-semibold">
+      <a href="/categoria/farmacia" class="text-farma-primary hover:underline text-sm font-semibold">
         Ver todos →
       </a>
     </div>
