@@ -1,0 +1,145 @@
+---
+// src/pages/admin/index.astro
+
+// 1. IMPORTS (Esto es lo que faltaba)
+import Layout from '../../layouts/Layout.astro';
+import ProductForm from '../../components/admin/ProductForm'; // <--- AQUÍ IMPORTAMOS EL COMPONENTE
+import { supabase } from '../../lib/supabase';
+
+// 2. Lógica del Servidor (Cargar la tabla inicial)
+// Traemos los productos para listarlos en la tabla de la derecha
+const { data: productos } = await supabase
+  .from('productos')
+  .select('id, nombre, precio, stock, imagenes_producto(url)')
+  .order('creado_en', { ascending: false });
+
+// 3. Lógica para borrar (Si recibimos un POST de borrado)
+if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
+  const idBorrar = formData.get("delete_id");
+  
+  if (idBorrar) {
+    await supabase.from('productos').delete().eq('id', idBorrar);
+    return Astro.redirect('/admin');
+  }
+}
+---
+
+<Layout title="Panel de Administración">
+  <div class="bg-gray-100 min-h-screen pb-20">
+    
+    <div class="bg-slate-900 text-white p-4 shadow-md">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-xl font-bold">🛠️ Admin Dashboard</h1>
+        <a href="/" class="text-sm text-gray-300 hover:text-white">Ver Tienda →</a>
+      </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-8">
+      
+      <div id="loading-msg" class="flex flex-col items-center justify-center py-20 text-gray-500 gap-4">
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-900"></div>
+        <p>Verificando credenciales de acceso...</p>
+      </div>
+
+      <div id="admin-panel" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-1">
+          <ProductForm client:load />
+        </div>
+
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Inventario Actual</h2>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm text-gray-500">
+                <thead class="bg-gray-50 text-gray-700 uppercase">
+                  <tr>
+                    <th class="px-4 py-3">Img</th>
+                    <th class="px-4 py-3">Nombre</th>
+                    <th class="px-4 py-3">Precio</th>
+                    <th class="px-4 py-3">Stock</th>
+                    <th class="px-4 py-3">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productos?.map((prod) => (
+                    <tr class="border-b hover:bg-gray-50">
+                      <td class="px-4 py-3">
+                        <img 
+                          src={prod.imagenes_producto?.[0]?.url || 'https://placehold.co/50'} 
+                          class="w-10 h-10 object-cover rounded"
+                        />
+                      </td>
+                      <td class="px-4 py-3 font-medium text-gray-900">{prod.nombre}</td>
+                      <td class="px-4 py-3">${prod.precio}</td>
+                      <td class="px-4 py-3">
+                        {prod.stock < 10 ? <span class="text-red-600 font-bold">{prod.stock}</span> : prod.stock}
+                      </td>
+                      <td class="px-4 py-3">
+                        <form method="POST" onsubmit="return confirm('¿Seguro que quieres borrar este producto?');">
+                          <input type="hidden" name="delete_id" value={prod.id} />
+                          <button type="submit" class="text-red-600 hover:underline">
+                            Borrar
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {(!productos || productos.length === 0) && (
+              <p class="text-center py-4 text-gray-400">No hay productos aún.</p>
+            )}
+
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</Layout>
+
+<script>
+  import { supabase } from '../../lib/supabase';
+
+  const adminPanel = document.getElementById('admin-panel');
+  const loadingMsg = document.getElementById('loading-msg');
+
+  async function validateAccess() {
+    try {
+      // 1. ¿Hay usuario logueado?
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      // 2. ¿Es Staff?
+      const { data: staff, error } = await supabase
+        .from('usuarios_sistema')
+        .select('rol')
+        .eq('id', user.id)
+        .single();
+
+      if (error || !staff) {
+        throw new Error('No tienes permisos de administrador.');
+      }
+
+      // 3. ¡ÉXITO!
+      if (loadingMsg) loadingMsg.style.display = 'none';
+      if (adminPanel) adminPanel.classList.remove('hidden');
+
+    } catch (err) {
+      console.error("Acceso denegado:", err);
+      alert('⛔ Acceso Denegado: Solo personal autorizado.');
+      window.location.href = '/'; 
+    }
+  }
+
+  validateAccess();
+</script>

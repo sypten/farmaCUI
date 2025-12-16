@@ -1,0 +1,44 @@
+---
+import { supabase } from '../lib/supabase';
+
+const { data: categorias } = await supabase
+  .from('categorias')
+  .select('nombre, slug')
+  .order('nombre', { ascending: true });
+---
+
+<nav class="bg-blue-800 text-white shadow-inner w-full border-t border-blue-900">
+  <div class="container mx-auto px-4">
+    <ul class="flex gap-6 overflow-x-auto text-sm font-medium whitespace-nowrap py-0 no-scrollbar">
+      
+      <li class="flex-shrink-0">
+        <a href="/" class="block py-3 hover:text-blue-200 border-b-2 border-transparent hover:border-blue-300 transition-colors">
+          Todas
+        </a>
+      </li>
+
+      {categorias && categorias.map((cat) => (
+        <li class="flex-shrink-0">
+          <a 
+            href={`/categoria/${cat.slug}`} 
+            class="block py-3 hover:text-blue-200 border-b-2 border-transparent hover:border-blue-300 transition-colors capitalize"
+          >
+            {cat.nombre}
+          </a>
+        </li>
+      ))}
+
+    </ul>
+  </div>
+</nav>
+
+<style>
+  /* Truco CSS para ocultar la barra de scroll fea pero mantener la funcionalidad */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+</style>
