@@ -1,9 +1,8 @@
-/* empty css                                 */
 import { e as createComponent, k as renderComponent, r as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_B4bjZISI.mjs';
 import 'piccolore';
 import { $ as $$Layout } from '../chunks/Layout_CItJmQG-.mjs';
-import { s as supabase, $ as $$Header } from '../chunks/Header_SyJxPTgK.mjs';
-import { P as ProductCard } from '../chunks/ProductCard_DADkbIRU.mjs';
+import { s as supabase, $ as $$Header } from '../chunks/Header_DCSvtagK.mjs';
+import { P as ProductCard } from '../chunks/ProductCard_Dz8RWXdo.mjs';
 export { renderers } from '../renderers.mjs';
 
 const $$Index = createComponent(async ($$result, $$props, $$slots) => {

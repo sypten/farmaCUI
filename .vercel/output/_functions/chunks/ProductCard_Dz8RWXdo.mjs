@@ -1,6 +1,6 @@
 import { jsxs, jsx } from 'react/jsx-runtime';
 import { useState } from 'react';
-import { a as addCartItem } from './Header_SyJxPTgK.mjs';
+import { a as addCartItem } from './Header_DCSvtagK.mjs';
 
 function ProductCard({ id, name, price, image, slug, category, discount }) {
   const [isAdding, setIsAdding] = useState(false);
