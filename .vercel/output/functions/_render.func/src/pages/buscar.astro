@@ -1,0 +1,77 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import ProductCard from '../components/ProductCard.jsx';
+import { supabase } from '../lib/supabase';
+
+// 1. Obtener el parámetro de búsqueda 'q' de la URL
+const query = Astro.url.searchParams.get('q') || '';
+
+let products = [];
+let errorMsg = null;
+
+if (query) {
+  // 2. Buscar en Supabase (Case Insensitive 'ilike')
+  // Buscamos productos donde el nombre contenga el texto ( %texto% )
+  const { data, error } = await supabase
+    .from('productos')
+    .select(`
+        *,
+        categoria:categorias(nombre, slug),
+        imagenes:imagenes_producto(url)
+    `)
+    .gt('stock', 0)
+    .ilike('nombre', `%${query}%`) // <--- La magia del filtro
+    .order('precio', { ascending: true }); // Ordenar por precio, por ejemplo
+
+  if (error) {
+    errorMsg = error.message;
+  } else {
+    products = data;
+  }
+}
+---
+
+<Layout title={`Resultados para "${query}" - FarmaCUI`}>
+  <Header />
+
+  <main class="container mx-auto px-4 py-8">
+    
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-farma-text">
+        {query ? `Resultados para: "${query}"` : 'Búsqueda de Productos'}
+      </h1>
+      <p class="text-farma-gray">
+        {query ? `Se encontraron ${products.length} coincidencias.` : 'Escribe algo en el buscador para comenzar.'}
+      </p>
+    </div>
+
+    {errorMsg && (
+        <div class="bg-farma-error bg-opacity-10 text-farma-error p-4 rounded mb-6 border border-farma-error border-opacity-20">Error: {errorMsg}</div>
+    )}
+
+    {/* LISTADO DE RESULTADOS */}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {products.map((product) => (
+        <ProductCard 
+          client:load 
+          id={product.id}
+          name={product.nombre}
+          price={product.precio}
+          image={product.imagenes?.[0]?.url || ''} 
+          slug={product.slug}
+          discount={0} 
+          category={product.categoria?.nombre || 'General'}
+        />
+      ))}
+    </div>
+
+    {query && products.length === 0 && (
+      <div class="text-center py-20 bg-white rounded-lg border border-farma-muted border-dashed">
+        <p class="text-farma-gray text-lg">No encontramos productos con ese nombre. 🕵️‍♀️</p>
+        <a href="/" class="text-farma-primary font-bold hover:underline mt-2 inline-block">Ver todo el catálogo</a>
+      </div>
+    )}
+
+  </main>
+</Layout>

@@ -1,0 +1,80 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import ProductCard from '../../components/ProductCard.jsx';
+import { supabase } from '../../lib/supabase';
+
+// 1. Obtener el "slug" de la URL (ej: 'farmacia' o 'perfumeria')
+const { slug } = Astro.params;
+
+// 2. Primero consultamos la info de la CATEGORÍA para saber su nombre bonito y ID
+const { data: categoria, error: catError } = await supabase
+  .from('categorias')
+  .select('*')
+  .eq('slug', slug)
+  .single();
+
+// Si la categoría no existe, redirigimos al 404 (o al home por ahora)
+if (!categoria) {
+  return Astro.redirect('/404');
+}
+
+// 3. Ahora traemos los PRODUCTOS de esa categoría
+const { data: products, error: prodError } = await supabase
+  .from('productos')
+  .select(`
+    *,
+    imagenes:imagenes_producto(url)
+  `)
+  .gt('stock', 0)
+  .eq('categoria_id', categoria.id)
+  .order('creado_en', { ascending: false });
+
+---
+
+<Layout title={`${categoria.nombre} - FarmaCUI`}>
+  <Header />
+
+  <div class="bg-white min-h-screen py-8">
+    <main class="container mx-auto px-4">
+      
+      <div class="mb-8 flex items-end gap-4 border-b pb-4 border-farma-muted">
+        <div>
+          <p class="text-sm text-farma-gray font-bold uppercase tracking-wider mb-1">Categoría</p>
+          <h1 class="text-4xl font-extrabold text-farma-primary">{categoria.nombre}</h1>
+        </div>
+        <span class="text-farma-gray pb-2">
+          ({products ? products.length : 0} productos)
+        </span>
+      </div>
+
+      {products && products.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <ProductCard 
+              client:visible
+              id={product.id}
+              name={product.nombre}
+              price={product.precio}
+              image={product.imagenes?.[0]?.url || ''} 
+              slug={product.slug}
+              discount={0} 
+              category={categoria.nombre}
+            />
+          ))}
+        </div>
+      ) : (
+        // Estado Vacío
+        <div class="text-center py-20">
+          <div class="text-6xl mb-4">📦</div>
+          <h3 class="text-xl font-bold text-gray-700">Esta categoría está vacía</h3>
+          <p class="text-gray-500 mt-2">Pronto agregaremos productos aquí.</p>
+          <a href="/" class="inline-block mt-6 px-6 py-2 bg-farma-primary text-white rounded hover:bg-farma-secondary transition">
+            Volver al inicio
+          </a>
+        </div>
+      )}
+
+    </main>
+  </div>
+</Layout>
