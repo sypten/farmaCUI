@@ -2,7 +2,8 @@
 dist/
 # generated types
 .astro/
-
+# Documentacion
+nocompartir/
 # dependencies
 node_modules/
 
