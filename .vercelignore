@@ -1,0 +1,6 @@
+nocompartir/
+.git/
+.gitignore
+.env.local
+.env.*.local
+*.md
