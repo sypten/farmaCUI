@@ -9,5 +9,7 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
   output: 'server',
   integrations: [tailwindcss(), react()],
-  adapter: vercel()
+  adapter: vercel({
+    edgeMiddleware: false
+  })
 });
