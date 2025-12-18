@@ -1,3 +1,4 @@
+/* empty css                                    */
 import { e as createComponent, f as createAstro, r as renderTemplate, k as renderComponent, m as maybeRenderHead, h as addAttribute } from '../../chunks/astro/server_B4bjZISI.mjs';
 import 'piccolore';
 import { $ as $$Layout } from '../../chunks/Layout_CItJmQG-.mjs';
