@@ -60,18 +60,47 @@
 
         if (session) {
           // Sesión establecida exitosamente
-          // Verificar si es admin, staff o superadmin
+          const userId = session.user.id;
+          
+          // 1. Verificar si existe en usuarios_sistema (staff, admin, superadmin)
           const { data: usuario } = await supabase
             .from('usuarios_sistema')
             .select('rol')
-            .eq('id', session.user.id)
+            .eq('id', userId)
             .single();
 
           if (usuario && ['staff', 'admin', 'superadmin'].includes(usuario.rol)) {
+            // Es personal administrativo
             window.location.href = '/admin';
-          } else {
-            window.location.href = '/?verified=true';
+            return;
           }
+
+          // 2. Si no es admin, verificar/crear en tabla clientes
+          const { data: cliente } = await supabase
+            .from('clientes')
+            .select('id')
+            .eq('id', userId)
+            .single();
+
+          if (!cliente) {
+            // Crear cliente nuevo
+            const { error: insertError } = await supabase
+              .from('clientes')
+              .insert({
+                id: userId,
+                nombre_completo: session.user.user_metadata.full_name || 'Usuario',
+                email: session.user.email,
+                telefono: null,
+                direccion: null
+              });
+
+            if (insertError) {
+              console.error('Error creando cliente:', insertError);
+            }
+          }
+
+          // Redirigir a la home
+          window.location.href = '/?verified=true';
         } else {
           // No hay sesión, redirigir al login
           window.location.href = '/login';
