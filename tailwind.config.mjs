@@ -3,6 +3,11 @@ export default {
 	content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
 	theme: {
 		extend: {
+			fontFamily: {
+				sans: ['Playpen Sans', 'sans-serif'],
+				heading: ['Londrina Solid', 'cursive'],
+				brand: ['Antonio', 'sans-serif'],
+			},
 			colors: {
 				// Paleta personalizada basada en tu imagen
 				farma: {
