@@ -25,6 +25,23 @@ export default function CartList() {
     setGuestData({ ...guestData, [e.target.name]: e.target.value });
   };
 
+  // Función auxiliar para crear el texto bonito de WhatsApp
+  const buildWhatsAppMessage = (orderId, buyer, items, total) => {
+    let text = `👋 *¡Hola! Quiero confirmar mi nuevo pedido.*\n\n`;
+    text += `🆔 *Orden:* #${orderId}\n`;
+    text += `👤 *Cliente:* ${buyer.name}\n`;
+    text += `📧 *Email:* ${buyer.email}\n\n`;
+    
+    text += `🛒 *Detalle del pedido:*\n`;
+    items.forEach(item => {
+      text += `- ${item.quantity}x ${item.name} ($${item.price})\n`;
+    });
+    
+    text += `\n💰 *TOTAL: $${total.toLocaleString('es-AR')}*`;
+    
+    return encodeURIComponent(text); // Importante para que funcione el link
+  };
+
   // --- LÓGICA DE COMPRA UNIFICADA ---
   const handleCheckout = async (e) => {
     if(e) e.preventDefault();
@@ -61,8 +78,28 @@ export default function CartList() {
 
       if (result.success) {
         clearCart();
-        alert(`¡Gracias por tu compra, ${buyerInfo.name}! 🎉\nOrden #${result.orderId}\nTe enviamos el detalle a ${buyerInfo.email}`);
+        // 1. Número de WhatsApp de la Farmacia (Ej: 549 + característica + numero)
+        const PHONE_NUMBER = import.meta.env.PUBLIC_WHATSAPP_NUMBER;
+
+        if (!PHONE_NUMBER) {
+          console.error("Falta configurar el número de WhatsApp en el .env");
+          alert("Pedido confirmado, pero no pudimos abrir WhatsApp. Contactanos por favor.");
+          window.location.href = '/';
+          return;
+        }
+
+        // 2. Generar el link
+        const message = buildWhatsAppMessage(result.orderId, buyerInfo, items, total);
+        const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${message}`;
+
+        alert(`¡Pedido #${result.orderId} creado! Te redirigimos a WhatsApp para finalizar.`);
+
+        // 4. Abrir WhatsApp en una pestaña nueva
+        window.open(whatsappUrl, '_blank');
+
+        // 5. Redirigir al home en la ventana actual
         window.location.href = '/'; 
+
       } else {
         alert("Error: " + result.error);
       }

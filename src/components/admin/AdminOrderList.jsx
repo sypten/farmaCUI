@@ -5,14 +5,14 @@ export default function AdminOrderList() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Cargar Ventas
   useEffect(() => {
     fetchOrders();
   }, []);
 
   const fetchOrders = async () => {
     setLoading(true);
-    // Traemos la venta y sus detalles anidados
+    // 1. CONSULTA ROBUSTA
+    // Traemos 'productos' directamente sin alias para evitar confusiones
     const { data, error } = await supabase
       .from('ventas')
       .select(`
@@ -20,17 +20,22 @@ export default function AdminOrderList() {
         detalle_ventas (
           cantidad,
           precio_final_unitario,
-          producto:productos (nombre)
+          productos (
+            nombre
+          )
         )
       `)
-      .order('fecha', { ascending: false }); // Más recientes primero
+      .order('fecha', { ascending: false });
 
-    if (error) console.error('Error cargando ventas:', error);
-    else setOrders(data);
+    if (error) {
+      console.error('❌ Error cargando ventas:', error);
+    } else {
+      console.log('📦 Data recibida de Supabase:', data); // <--- MIRA ESTO EN CONSOLA (F12)
+      setOrders(data);
+    }
     setLoading(false);
   };
 
-  // Función para cambiar estado
   const handleStatusChange = async (orderId, newStatus) => {
     const { error } = await supabase
       .from('ventas')
@@ -40,18 +45,30 @@ export default function AdminOrderList() {
     if (error) {
       alert('Error actualizando: ' + error.message);
     } else {
-      // Actualizamos la UI localmente para no recargar todo
       setOrders(orders.map(o => o.id === orderId ? { ...o, estado: newStatus } : o));
     }
   };
 
-  // Colores para las etiquetas de estado - Paleta FarmaCUI
   const statusColors = {
-    pendiente: 'bg-farma-warning bg-opacity-20 text-farma-warning border-farma-warning/30',
-    pagado: 'bg-farma-primary bg-opacity-20 text-farma-primary border-farma-primary/30',
-    enviado: 'bg-farma-accent bg-opacity-20 text-farma-accent border-farma-accent/30',
-    entregado: 'bg-farma-success bg-opacity-20 text-farma-success border-farma-success/30',
-    cancelado: 'bg-farma-error bg-opacity-20 text-farma-error border-farma-error/30',
+    pendiente: 'bg-orange-100 text-orange-800 border-orange-200',
+    pagado: 'bg-purple-100 text-purple-800 border-purple-200',
+    enviado: 'bg-blue-100 text-blue-800 border-blue-200',
+    entregado: 'bg-green-100 text-green-800 border-green-200',
+    cancelado: 'bg-red-100 text-red-800 border-red-200',
+  };
+
+  // Función auxiliar para extraer el nombre del producto de forma segura
+  const getProductName = (item) => {
+    // Caso 1: Supabase devolvió un array (común en relaciones 1:N mal detectadas)
+    if (Array.isArray(item.productos)) {
+      return item.productos[0]?.nombre;
+    }
+    // Caso 2: Supabase devolvió un objeto (lo correcto)
+    if (item.productos && typeof item.productos === 'object') {
+      return item.productos.nombre;
+    }
+    // Caso 3: No hay datos (producto borrado o error)
+    return null;
   };
 
   if (loading) {
@@ -65,63 +82,75 @@ export default function AdminOrderList() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-farma-text">📦 Últimos Pedidos ({orders.length})</h2>
-        <button onClick={fetchOrders} className="text-sm text-farma-primary hover:text-farma-secondary transition">🔄 Actualizar</button>
+        <h2 className="text-xl font-bold text-gray-800">📦 Últimos Pedidos ({orders.length})</h2>
+        <button onClick={fetchOrders} className="text-sm text-farma-primary hover:text-purple-700 transition font-bold">🔄 Actualizar</button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden border border-farma-muted">
-        <table className="min-w-full divide-y divide-farma-muted">
-          <thead className="bg-farma-accent bg-opacity-10">
+      <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-purple-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-farma-text uppercase tracking-wider">Orden / Cliente</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-farma-text uppercase tracking-wider">Productos</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-farma-text uppercase tracking-wider">Total</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-farma-text uppercase tracking-wider">Estado</th>
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Orden / Cliente</th>
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Productos</th>
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Total</th>
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-farma-accent hover:bg-opacity-5 transition">
+              <tr key={order.id} className="hover:bg-gray-50 transition">
                 
-                {/* 1. Cliente y Fecha */}
+                {/* 1. Cliente */}
                 <td className="px-6 py-4">
-                  <div className="text-sm font-bold text-farma-text">#{order.numero_orden}</div>
-                  <div className="text-sm text-farma-gray">{order.cliente_nombre}</div>
-                  <div className="text-xs text-farma-gray/60 mt-1">
+                  <div className="text-sm font-bold text-gray-900">#{order.numero_orden}</div>
+                  <div className="text-sm text-gray-500">{order.cliente_nombre || 'Cliente'}</div>
+                  <div className="text-xs text-gray-400 mt-1">
                     {new Date(order.fecha).toLocaleDateString()}
                   </div>
-                  {/* Si es invitado (cliente_id null), mostramos una etiqueta */}
-                  {!order.cliente_id && (
-                    <span className="inline-flex mt-1 items-center px-2 py-0.5 rounded text-xs font-medium bg-farma-accent bg-opacity-10 text-farma-text">
-                      Invitado
-                    </span>
+                  {order.direccion_envio && (
+                    <div className="mt-1 text-xs bg-gray-100 p-1 rounded inline-block text-gray-600 max-w-[150px] truncate" title={order.direccion_envio}>
+                      📍 {order.direccion_envio}
+                    </div>
                   )}
                 </td>
 
-                {/* 2. Lista de Productos */}
+                {/* 2. Productos (AQUÍ ESTÁ LA MAGIA) */}
                 <td className="px-6 py-4">
-                  <ul className="text-sm text-farma-text space-y-1">
-                    {order.detalle_ventas.map((item, idx) => (
-                      <li key={idx}>
-                        <span className="font-bold">{item.cantidad}x</span> {item.producto?.nombre || 'Producto borrado'}
-                      </li>
-                    ))}
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    {order.detalle_ventas && order.detalle_ventas.map((item, idx) => {
+                      const nombre = getProductName(item);
+                      return (
+                        <li key={idx} className="flex items-center gap-2">
+                           <span className="font-bold text-purple-600 bg-purple-50 px-1.5 rounded text-xs">{item.cantidad}x</span> 
+                           {nombre ? (
+                             <span>{nombre}</span>
+                           ) : (
+                             <span className="text-red-400 italic text-xs">
+                               (Producto no encontrado: ID {item.producto_id})
+                             </span>
+                           )}
+                        </li>
+                      );
+                    })}
+                    {(!order.detalle_ventas || order.detalle_ventas.length === 0) && (
+                        <li className="text-xs text-gray-400 italic">Sin detalles</li>
+                    )}
                   </ul>
                 </td>
 
                 {/* 3. Total */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-bold text-farma-primary">
-                    $ {order.total_final.toLocaleString('es-AR')}
+                    $ {order.total?.toLocaleString('es-AR')}
                   </div>
                 </td>
 
-                {/* 4. Selector de Estado */}
+                {/* 4. Estado */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <select
                     value={order.estado}
                     onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                    className={`block w-full text-xs font-bold py-1 px-2 rounded border focus:outline-none focus:ring-2 focus:ring-farma-primary cursor-pointer ${statusColors[order.estado] || 'bg-farma-accent bg-opacity-10'}`}
+                    className={`block w-full text-xs font-bold py-1 px-2 rounded border focus:outline-none focus:ring-2 focus:ring-farma-primary cursor-pointer ${statusColors[order.estado] || 'bg-gray-100 text-gray-800'}`}
                   >
                     <option value="pendiente">🕒 Pendiente</option>
                     <option value="pagado">💰 Pagado</option>
@@ -137,8 +166,8 @@ export default function AdminOrderList() {
         </table>
 
         {orders.length === 0 && (
-          <div className="p-10 text-center text-farma-gray">
-            No hay pedidos registrados todavía.
+          <div className="p-10 text-center text-gray-400">
+            No se encontraron pedidos.
           </div>
         )}
       </div>

@@ -1,0 +1,59 @@
+---
+import { supabase } from '../lib/supabase';
+
+// 1. Cargar Banners desde Supabase (Solo los activos)
+const { data: banners, error } = await supabase
+  .from('banners')
+  .select('*')
+  .eq('activo', true)
+  .order('orden', { ascending: true });
+
+if (error) console.error("Error cargando banners:", error);
+---
+
+<section class="container mx-auto px-4 py-8">
+  <h2 class="text-2xl font-bold text-farma-text mb-6 flex items-center gap-2">
+    🔥 Ofertas Destacadas
+  </h2>
+
+  {banners && banners.length > 0 ? (
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[200px]">
+      
+      {banners.map((banner) => (
+        <a 
+          href={banner.link}
+          class={`
+            group relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1
+            flex flex-col justify-end
+            ${banner.clase_grid} 
+          `}
+          style="background-color: #f3f4f6;" 
+        >
+          <img 
+            src={banner.imagen_url} 
+            alt={banner.titulo} 
+            class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0"
+          />
+          
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-10 opacity-80 group-hover:opacity-90 transition-opacity"></div>
+
+          <div class="relative z-20 p-4">
+            <span class="inline-block px-2 py-1 bg-white/90 text-farma-primary text-xs font-bold rounded-full mb-2 shadow-sm backdrop-blur-sm">
+               Ver Oferta
+            </span>
+            <h3 class="text-white font-bold text-xl leading-tight drop-shadow-lg">{banner.titulo}</h3>
+            {banner.subtitulo && (
+                <p class="text-gray-100 text-sm font-medium drop-shadow-md mt-1">{banner.subtitulo}</p>
+            )}
+          </div>
+        </a>
+      ))}
+
+    </div>
+  ) : (
+    // Fallback si no hay banners (Opcional: puedes borrar esto si prefieres que no se muestre nada)
+    <div class="p-8 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
+        <p class="text-gray-500">Cargando ofertas increíbles...</p>
+    </div>
+  )}
+</section>

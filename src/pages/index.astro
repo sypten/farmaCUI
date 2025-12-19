@@ -4,6 +4,7 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import ProductCard from '../components/ProductCard.jsx';
 import { supabase } from '../lib/supabase';
+import BentoGrid from '../components/BentoGrid.astro';
 
 // 1. Consulta a Supabase
 // Traemos productos + nombre de categoría + imágenes
@@ -31,6 +32,8 @@ if (error) {
       <h1 class="text-4xl font-extrabold text-farma-primary mb-2">Bienvenido a <span class="font-brand">FARMA CUI</span></h1>
       <p class="text-farma-gray text-lg">La salud es tu mayor riqueza</p>
     </div>
+    
+    <BentoGrid />
     
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-bold text-farma-text border-l-4 border-farma-primary pl-3">

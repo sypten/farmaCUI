@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import AddressList from './AddressList';
 
 export default function UserProfile() {
   const [loading, setLoading] = useState(true);
@@ -28,7 +29,7 @@ export default function UserProfile() {
             detalle_ventas (
               cantidad,
               precio_final_unitario,
-              producto:productos (nombre)
+              productos (nombre)
             )
           `)
           .eq('cliente_id', user.id)
@@ -78,7 +79,7 @@ export default function UserProfile() {
           <div className="text-left text-sm text-gray-600 space-y-2">
             <p>📅 Miembro desde: {new Date(user.created_at).toLocaleDateString()}</p>
           </div>
-          
+          <AddressList userId={user.id} />
           <button 
             onClick={async () => { await supabase.auth.signOut(); window.location.href='/'; }}
             className="mt-6 w-full border border-farma-error text-farma-error py-2 rounded hover:bg-farma-error hover:bg-opacity-5 text-sm font-bold"
@@ -109,7 +110,7 @@ export default function UserProfile() {
                   </div>
                   <div>
                     <span className="text-xs font-bold text-gray-500 uppercase tracking-wide block">Total</span>
-                    <p className="text-farma-success font-bold">$ {orden.total_final?.toLocaleString('es-AR')}</p>
+                    <p className="text-farma-success font-bold">$ {orden.total?.toLocaleString('es-AR')}</p>
                   </div>
                   <div>
                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase inline-block
@@ -126,7 +127,7 @@ export default function UserProfile() {
                     {orden.detalle_ventas.map((item, idx) => (
                       <li key={idx} className="py-2 flex justify-between text-sm">
                         <span className="text-gray-700">
-                          <span className="font-bold">{item.cantidad}x</span> {item.producto?.nombre || 'Producto no disponible'}
+                          <span className="font-bold">{item.cantidad}x</span> {item.productos?.nombre || 'Producto no disponible'}
                         </span>
                         <span className="text-gray-500">
                           $ {item.precio_final_unitario?.toLocaleString('es-AR')}
